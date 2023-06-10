@@ -1,0 +1,2 @@
+# States for the bot
+TYPING_BARCODE, CHOOSING, TYPING_PAPER, TYPING_ISSUE = range(4)

@@ -1,0 +1,4 @@
+.env
+googleCredentials.json
+__pycache__
+/myenv
