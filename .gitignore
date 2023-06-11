@@ -2,3 +2,4 @@
 googleCredentials.json
 __pycache__
 /myenv
+.vscode

@@ -8,10 +8,12 @@ from telegram.ext import (
 import keyBoards
 import handlers
 import config
+import models.classes as classes
 import utils
 
 markup_1 = ReplyKeyboardMarkup(keyBoards.reply_keyboard_1, one_time_keyboard=True)
-language_markup = ReplyKeyboardMarkup(keyBoards.reply_keyboard_lang, one_time_keyboard=True)
+markup_2 = ReplyKeyboardMarkup(keyBoards.reply_keyboard_2, one_time_keyboard=True)
+classes_markup = ReplyKeyboardMarkup(keyBoards.reply_keyboard_classes, one_time_keyboard=True)
 
 # Functions for the bot
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -35,33 +37,28 @@ async def enter_barcode(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 async def enter_paper_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     text = update.message.text
     context.user_data["paper"] = text
+
+    paper = context.user_data["paper"]
+    clz = context.user_data["class"]
+    barcode = context.user_data["barcode"]
+
     # pprint.pprint(context.user_data)
-
     if context.user_data["choice"] == "🔖  Get Marks":
-        params = {"barcode": context.user_data["barcode"], "paper_no": context.user_data["paper"]}
-        paper_no = params["paper_no"]
-        sheet_id = "Paper " + params["paper_no"]
-        data = {"message": params['barcode'], "chat_id": update.message.chat_id, "paper_no": paper_no, "sheet_id": sheet_id}
-        response = requests.post(config.WEBHOOK_LINK_2, data=data)
-        response_data = response.json()
-
-        if response_data["status"] == "success":
-            data_record = response_data["data"][0]
-            await update.message.reply_html(utils.generate_beautiful_message(
-                name=data_record[1],
-                marks=data_record[4],
-                Drank=data_record[0],
-                Arank="-",
-                link="-",
-                year="2023",
-                paper_no=paper_no,
-                ptype="ONLINE"
-            ))
-        elif response_data["status"] == "failed":
-            await update.message.reply_text(response_data["message"])
-        else:
-            await update.message.reply_text("Something went wrong")
-
+        try:
+            data = classes.get_marks(clz, paper, barcode).to_dict()
+            studentData = data['student_id'].get().to_dict()
+            await update.message.reply_html(utils.generate_marks_message(
+                        name=studentData['name'],
+                        marks=data['marks'],
+                        Drank=data['rank'],
+                        Arank="-",
+                        link="-",
+                        year=clz,
+                        paper_no=paper,
+                        ptype="ONLINE"
+                    ))
+        except TypeError:
+            await update.message.reply_text("Data not found!")
     elif context.user_data["choice"] == "🧾  Get Paper":
         await update.message.reply_html("This Feature is not available yet.")
     else:
@@ -138,3 +135,26 @@ async def done(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     )
     return ConversationHandler.END
 
+
+async def choose_class(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    text = update.message.text
+    context.user_data["choice"] = text
+    await update.message.reply_text(
+        "Choose your class : "
+        , reply_markup=classes_markup
+    )
+    return handlers.CHOOSING_CLASS
+
+
+async def choose_operation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    text = update.message.text
+    context.user_data["class"] = text
+    await update.message.reply_text(
+        "Choose an option : "
+        , reply_markup=markup_2
+    )
+    return handlers.CHOOSING_OPERATION
+
+
+    
+    

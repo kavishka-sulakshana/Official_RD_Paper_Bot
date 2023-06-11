@@ -7,17 +7,14 @@ from telegram.ext import (
 )
 
 # States for the bot
-TYPING_BARCODE, CHOOSING, TYPING_PAPER, TYPING_ISSUE, CHOOSING_CLASS = range(5)
+TYPING_BARCODE, CHOOSING, TYPING_PAPER, TYPING_ISSUE, CHOOSING_CLASS, CHOOSING_OPERATION = range(6)
 
 conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", functions.start)],
         states={
             CHOOSING: [
                 MessageHandler(
-                    filters.Regex("^🔖  Get Marks$"), functions.get_marks
-                ),
-                MessageHandler(
-                    filters.Regex("^🧾  Get Paper$"), functions.get_papers
+                    filters.Regex("^🧾  Get Papers$"), functions.choose_class
                 ),
                 MessageHandler(
                     filters.Regex("^📍 Paper Issues$"), functions.paper_issue
@@ -38,6 +35,19 @@ conv_handler = ConversationHandler(
                     filters.TEXT, functions.enter_paper_issue
                 )
             ],
+            CHOOSING_CLASS: [
+                MessageHandler(
+                    filters.TEXT, functions.choose_operation
+                )
+            ],
+            CHOOSING_OPERATION: [
+                MessageHandler(
+                    filters.Regex("^🔖  Get Marks$"), functions.get_marks
+                ),
+                MessageHandler(
+                    filters.Regex("^📝  Get Marked Paper$"), functions.get_papers
+                ),
+            ]
         },
         fallbacks=[MessageHandler(filters.Regex("^❌  Close"), functions.done)],
     )
