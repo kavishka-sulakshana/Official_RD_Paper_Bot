@@ -10,6 +10,7 @@ import handlers
 import config
 import models.classes as classes
 import utils
+import pprint
 
 markup_1 = ReplyKeyboardMarkup(keyBoards.reply_keyboard_1, one_time_keyboard=True)
 markup_2 = ReplyKeyboardMarkup(keyBoards.reply_keyboard_2, one_time_keyboard=True)
@@ -46,9 +47,10 @@ async def enter_paper_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if context.user_data["choice"] == "🔖  Get Marks":
         try:
             data = classes.get_marks(clz, paper, barcode).to_dict()
-            studentData = data['student_id'].get().to_dict()
+            # pprint.pprint(data)
+            # studentData = data['student_id'].get().to_dict()
             await update.message.reply_html(utils.generate_marks_message(
-                        name=studentData['name'],
+                        name=barcode,
                         marks=data['marks'],
                         Drank=data['rank'],
                         Arank="-",
