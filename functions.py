@@ -15,11 +15,12 @@ import pprint
 markup_1 = ReplyKeyboardMarkup(keyBoards.reply_keyboard_1, one_time_keyboard=True)
 markup_2 = ReplyKeyboardMarkup(keyBoards.reply_keyboard_2, one_time_keyboard=True)
 classes_markup = ReplyKeyboardMarkup(keyBoards.reply_keyboard_classes, one_time_keyboard=True)
+markup_close = ReplyKeyboardMarkup(keyBoards.reply_keyboard_close, one_time_keyboard=True)
 
 # Functions for the bot
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text(
-        "Enter your barcode : "
+        "🪪 ඔබගේ Barcode අංකය ඇතුලත් කරන්න :"
     )
     return handlers.TYPING_BARCODE
 
@@ -27,9 +28,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def enter_barcode(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     text = update.message.text
     context.user_data["barcode"] = text
-    await update.message.reply_text(
-        "This bot will help you to get your papers and marks\n"
-        "Choose an option : "
+    await update.message.reply_html(
+        "😄<u>PAPER CLASS BOT</u> 😄\n\n"
+        "💡 මෙම Bot ඔබගේ ප්‍රශ්න පත්‍ර සහ ප්‍රශ්න පත්‍ර වල ලකුණු ලබාගැනීමට, ප්‍රශ්න පත්‍ර සම්බන්ධ ගැටළු අපවෙත යොමුකිරිම පහසු කිරීම සඳහා ඔබ‍ට සහය වේ.\n\n"
+        "✨️ <i>මෙම Bot ගේ සමහර යෙදුම් තවමත් සැකසුම් මට්ටමේ පවතියි.</i>\n\n"
+        "🤖 BOT ගෙන් හදිසියේ ඉවත් වීමට අවශ්‍ය නම් /close භාවිත කරන්න..\n\n"
+        "🔥 පහතින් ඔබ‍ට අවශ්‍ය විකල්පයක් තෝරාගන්න..\n\n"
         , reply_markup=markup_1
     )
     return handlers.CHOOSING
@@ -60,14 +64,18 @@ async def enter_paper_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                         ptype="ONLINE"
                     ))
         except TypeError:
-            await update.message.reply_text("Data not found!")
+            await update.message.reply_text("✉️ Alert -> \n\nඔබ මෙම ප්‍රශ්න පත්‍රය සඳහා පිළිතුරු ලබාදී නොමැත.\n\n ✏️ __")
     elif context.user_data["choice"] == "🧾  Get Paper":
-        await update.message.reply_html("This Feature is not available yet.")
+        await update.message.reply_html(
+            "🔩🛠\n\n"
+            "🔒 මෙම තෝරාගැනීම තවමත් සැකසුම් තත්වයේ පවතී...\n\n"
+            "🛡🛡"
+        )
     else:
-        await update.message.reply_text("Invalid Choice")
+        await update.message.reply_text("🛡 Invalid Choice !")
 
     await update.message.reply_text(
-        "Choose an option : "
+        "🔥 පහතින් ඔබ‍ට අවශ්‍ය විකල්පයක් තෝරාගන්න.. "
         , reply_markup=markup_1
     )
     return handlers.CHOOSING
@@ -77,7 +85,7 @@ async def get_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     text = update.message.text
     context.user_data["choice"] = text
     await update.message.reply_text(
-        "Enter your paper no : "
+        "🪪 ඔබගේ ප්‍රශ්න පත්‍ර අංකය ඇතුලත් කරන්න :"
     )
     return handlers.TYPING_PAPER
 
@@ -86,7 +94,7 @@ async def get_papers(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     text = update.message.text
     context.user_data["choice"] = text
     await update.message.reply_text(
-        "Enter your paper no : "
+        "🪪 ඔබගේ ප්‍රශ්න පත්‍ර අංකය ඇතුලත් කරන්න :"
     )
     return handlers.TYPING_PAPER
 
@@ -95,7 +103,8 @@ async def paper_issue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
     text = update.message.text
     context.user_data["choice"] = text
     await update.message.reply_text(
-        "Enter Your Complaint : "
+        "📥 \n\n ඔබගේ ගැටලුව පැහැදිලිව යොමු කරන්න..",
+        reply_markup=markup_close
     )
     return handlers.TYPING_ISSUE
 
@@ -120,19 +129,18 @@ async def enter_paper_issue(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         await update.message.reply_text(response_data["message"])
 
     await update.message.reply_text(
-        "Choose an option : "
+        "🔥 පහතින් ඔබ‍ට අවශ්‍ය විකල්පයක් තෝරාගන්න.. "
         , reply_markup=markup_1
     )
     return handlers.CHOOSING
 
 
 async def done(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_data = context.user_data
-    user_data.clear()
+    context.user_data.clear()
     await update.message.reply_html(
         "\n<b>👋🏼 Bye! </b>\n"
-        "\nGood Luck for your exams. 😄😄\n"
-        "\n<u>To start again</u> /start 😎\n",
+        "\nGood Luck for your exams. 😄😄\n\n"
+        "\n<u>නැවත ආරම්භ කිරීමට</u> /start 😎\n",
         reply_markup=ReplyKeyboardRemove(),
     )
     return ConversationHandler.END
@@ -142,7 +150,7 @@ async def choose_class(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     text = update.message.text
     context.user_data["choice"] = text
     await update.message.reply_text(
-        "Choose your class : "
+        "🔥 පහතින් ඔබගේ පන්තිය තෝරාගන්න.. "
         , reply_markup=classes_markup
     )
     return handlers.CHOOSING_CLASS
@@ -152,11 +160,48 @@ async def choose_operation(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     text = update.message.text
     context.user_data["class"] = text
     await update.message.reply_text(
-        "Choose an option : "
+        "🔥 පහතින් ඔබ‍ට අවශ්‍ය විකල්පයක් තෝරාගන්න.. "
         , reply_markup=markup_2
     )
     return handlers.CHOOSING_OPERATION
 
 
-    
+async def invalid_choice_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    pprint.pprint(context)
+    await update.message.reply_text(
+        "🛡 Invalid Choice !"
+        , reply_markup=markup_1
+    )
+    return handlers.CHOOSING
+
+
+async def invalid_choice_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text(
+        "🛡 Invalid Choice !"
+        , reply_markup=markup_2
+    )
+    return handlers.CHOOSING_OPERATION
+
+
+async def cancel_issue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text(
+        "Complaint Closed \n"	
+        "Choose an option : "
+        , reply_markup=markup_1
+    )
+    return handlers.CHOOSING
+
+
+async def invalid_input_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text(
+         "✉️ Alert ->\n\nඔබ ලබාදී ඇත්තේ වැරදි barcode අංකයකි.කරුණාකර නිවැරදි Barcode අංකය ලබාදෙන්න.\n\n✏️ __"
+    )
+    return handlers.TYPING_BARCODE
+
+
+async def invalid_input_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text(
+         "✉️ Alert ->\n\nඔබ ලබාදී ඇත්තේ වැරදි ප්‍රශ්න පත්‍ර අංකයකි.කරුණාකර නිවැරදි ප්‍රශ්න පත්‍රයක් ලබාදෙන්න.\n\n✏️ __"
+    )
+    return handlers.TYPING_PAPER    
     

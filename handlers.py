@@ -9,6 +9,7 @@ from telegram.ext import (
 # States for the bot
 TYPING_BARCODE, CHOOSING, TYPING_PAPER, TYPING_ISSUE, CHOOSING_CLASS, CHOOSING_OPERATION = range(6)
 
+
 conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", functions.start)],
         states={
@@ -19,23 +20,41 @@ conv_handler = ConversationHandler(
                 MessageHandler(
                     filters.Regex("^📍 Paper Issues$"), functions.paper_issue
                 ),
+                MessageHandler(
+                    filters.Regex("^❌  Close"), functions.done
+                ),
+                MessageHandler(
+                    filters.TEXT, functions.invalid_choice_1
+                ),
             ],
             TYPING_BARCODE: [
                 MessageHandler(
                     filters.Regex("^[0-9]{8,10}$"), functions.enter_barcode
+                ),
+                CommandHandler("close", functions.done),
+                MessageHandler(
+                    filters.TEXT, functions.invalid_input_1
                 )
             ],
             TYPING_PAPER: [
                 MessageHandler(
                     filters.Regex("^[0-9]{2}$"), functions.enter_paper_no
+                ),
+                CommandHandler("close", functions.done),
+                MessageHandler(
+                    filters.TEXT, functions.invalid_input_2
                 )
             ],
             TYPING_ISSUE: [
+                MessageHandler(
+                    filters.Regex("^❌  Cancel$"), functions.cancel_issue
+                ),
                 MessageHandler(
                     filters.TEXT, functions.enter_paper_issue
                 )
             ],
             CHOOSING_CLASS: [
+                CommandHandler("close", functions.done),
                 MessageHandler(
                     filters.TEXT, functions.choose_operation
                 )
@@ -47,7 +66,14 @@ conv_handler = ConversationHandler(
                 MessageHandler(
                     filters.Regex("^📝  Get Marked Paper$"), functions.get_papers
                 ),
+                MessageHandler(
+                    filters.Regex("^❌  Close"), functions.done
+                ),
+                MessageHandler(
+                    filters.TEXT, functions.invalid_choice_2
+                ),
             ]
         },
-        fallbacks=[MessageHandler(filters.Regex("^❌  Close"), functions.done)],
+        fallbacks=[
+            MessageHandler(filters.Regex("^❌  Close"), functions.done)],
     )

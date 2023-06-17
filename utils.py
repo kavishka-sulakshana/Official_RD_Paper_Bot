@@ -8,7 +8,7 @@ def generate_marks_message(ptype="ONLINE", year="2023", paper_no="23", name="Kav
 
         💡 Your Marks : {marks} %
 
-        🏅 District Rank : {Drank} 
+        🏅 Rank : {Drank} 
 
         ————————————————
     """
