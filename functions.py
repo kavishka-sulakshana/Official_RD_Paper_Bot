@@ -9,6 +9,7 @@ import keyBoards
 import handlers
 import config
 import models.classes as classes
+import models.storage_functions as storage_functions
 import utils
 import pprint
 
@@ -50,6 +51,7 @@ async def enter_paper_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # pprint.pprint(context.user_data)
     if context.user_data["choice"] == "🔖  Get Marks":
         try:
+            searchingMsg = await update.message.reply_text("🔍 Searching...")
             data = classes.get_marks(clz, paper, barcode).to_dict()
             # pprint.pprint(data)
             # studentData = data['student_id'].get().to_dict()
@@ -63,14 +65,31 @@ async def enter_paper_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                         paper_no=paper,
                         ptype="ONLINE"
                     ))
+            await searchingMsg.delete()
         except TypeError:
             await update.message.reply_text("✉️ Alert -> \n\nඔබ මෙම ප්‍රශ්න පත්‍රය සඳහා පිළිතුරු ලබාදී නොමැත.\n\n ✏️ __")
-    elif context.user_data["choice"] == "🧾  Get Paper":
-        await update.message.reply_html(
-            "🔩🛠\n\n"
-            "🔒 මෙම තෝරාගැනීම තවමත් සැකසුම් තත්වයේ පවතී...\n\n"
-            "🛡🛡"
-        )
+            await searchingMsg.delete()
+
+    elif context.user_data["choice"] == "📝  Get Marked Paper":
+        bot = context.bot
+        chat_id = update.message.chat_id
+        filePath = "{}/{}".format(clz, paper)
+        fileName = "{}.pdf".format(barcode)
+        searchingMsg = await update.message.reply_sticker('assets/stickers/searching.tgs')
+        # searchingMsg = await update.message.reply_text("🔍 Searching...")
+        try:
+            data = classes.get_marks(clz, paper, barcode).to_dict()
+            storage_functions.save_file(filePath, fileName)
+            caption = "Marks : {}\n\nRank : {}".format(data['marks'], data['rank'])
+            await bot.send_document(chat_id=chat_id, 
+                            document="temp/{}".format(fileName),
+                            caption=caption)
+            storage_functions.delete_local_file("temp/{}".format(fileName))
+        except Exception as e:
+            # print(e)
+            await update.message.reply_text("✉️ Alert -> \n\nඔබ මෙම ප්‍රශ්න පත්‍රය සඳහා පිළිතුරු ලබාදී නොමැත.\n\n ✏️ __")
+        await searchingMsg.delete()
+
     else:
         await update.message.reply_text("🛡 Invalid Choice !")
 
@@ -176,11 +195,11 @@ async def invalid_choice_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 
 async def invalid_choice_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text(
-        "🛡 Invalid Choice !"
-        , reply_markup=markup_2
-    )
-    return handlers.CHOOSING_OPERATION
+        await update.message.reply_text(
+            "🛡 Invalid Choice !"
+            , reply_markup=markup_2
+        )
+        return handlers.CHOOSING_OPERATION
 
 
 async def cancel_issue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
