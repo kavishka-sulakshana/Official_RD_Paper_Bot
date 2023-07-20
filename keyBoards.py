@@ -1,7 +1,7 @@
 reply_keyboard_1 = [
     ["🧾  Get Papers"],
     ["📍 Paper Issues"],
-    # ["🎫  Register", "📊  See Analysis"],
+    ["📊  See Analysis"],
     ["❌  Close"],
 ]
 
@@ -24,4 +24,10 @@ reply_keyboard_classes = [
 
 reply_keyboard_close = [
     ["❌  Cancel"],
+]
+
+reply_keyboard_analytics = [
+    ["📊  Get Data Analysis"],
+    ["📈  Get Graph Analysis"],
+    ["Back", "❌  Close"],
 ]

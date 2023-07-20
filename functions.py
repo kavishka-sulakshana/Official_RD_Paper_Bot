@@ -16,6 +16,8 @@ markup_1 = ReplyKeyboardMarkup(
     keyBoards.reply_keyboard_1, one_time_keyboard=True)
 markup_2 = ReplyKeyboardMarkup(
     keyBoards.reply_keyboard_2, one_time_keyboard=True)
+markup_3 = ReplyKeyboardMarkup(
+    keyBoards.reply_keyboard_analytics, one_time_keyboard=True)
 classes_markup = ReplyKeyboardMarkup(
     keyBoards.reply_keyboard_classes, one_time_keyboard=True)
 markup_close = ReplyKeyboardMarkup(
@@ -184,8 +186,15 @@ async def invalid_choice_2(update: Update,  context: ContextTypes.DEFAULT_TYPE) 
     return handlers.CHOOSING_OPERATION
 
 
-async def cancel_issue(update: Update,
-                       context: ContextTypes.DEFAULT_TYPE) -> int:
+async def invalid_choice_3(update: Update,  context: ContextTypes.DEFAULT_TYPE) -> int:
+    if update.message.text == "Back":
+        await update.message.reply_text("🔥 පහතින් ඔබ‍ට අවශ්‍ය විකල්පයක් තෝරාගන්න.. ", reply_markup=markup_1)
+        return handlers.CHOOSING
+    await update.message.reply_text("🛡 Invalid Choice !", reply_markup=markup_3)
+    return handlers.CHOOSING_ANALYTIC
+
+
+async def cancel_issue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text("Complaint Closed \n"
                                     "Choose an option : ", reply_markup=markup_1)
     return handlers.CHOOSING
@@ -203,3 +212,48 @@ async def invalid_input_2(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         "✉️ Alert ->\n\nඔබ ලබාදී ඇත්තේ වැරදි ප්‍රශ්න පත්‍ර අංකයකි.කරුණාකර නිවැරදි ප්‍රශ්න පත්‍රයක් ලබාදෙන්න.\n\n✏️ __"
     )
     return handlers.TYPING_PAPER
+
+
+async def get_analytics(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text("🔥 පහතින් ඔබ‍ට අවශ්‍ය විකල්පයක් තෝරාගන්න.. ", reply_markup=markup_3)
+    return handlers.CHOOSING_ANALYTIC
+
+
+async def get_data_analytics(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    text = update.message.text
+    context.user_data["analytic_type"] = text
+    await update.message.reply_text("🔥 පහතින් ඔබගේ පන්තිය තෝරාගන්න.. ", reply_markup=classes_markup)
+    return handlers.CHOOSING_CLASS_ANALYTIC
+
+
+async def get_graph_analytics(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    text = update.message.text
+    context.user_data["analytic_type"] = text
+    await update.message.reply_text("🔥 පහතින් ඔබගේ පන්තිය තෝරාගන්න.. ", reply_markup=classes_markup)
+    return handlers.CHOOSING_CLASS_ANALYTIC
+
+
+async def showAnalytics(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    className = update.message.text
+    if context.user_data["analytic_type"] == "📊  Get Data Analysis":
+        try:
+            waitingMsg = await update.message.reply_text("⏳ Processing...")
+            data = classes.get_student_marks(
+                className, context.user_data["barcode"])
+            tpl = classes.get_average(data)
+            await update.message.reply_html(
+                utils.generate_analytics_message(
+                    tpl[1], tpl[0], data, className),
+                reply_markup=markup_3
+            )
+            await waitingMsg.delete()
+        except Exception as e:
+            await update.message.reply_text(f"SOMETHING WENT WRONG ! {e}", reply_markup=markup_3)
+            await waitingMsg.delete()
+        return handlers.CHOOSING_ANALYTIC
+    elif context.user_data["analytic_type"] == "📈  Get Graph Analysis":
+        await update.message.reply_text("This feature is not available !", reply_markup=markup_3)
+        return handlers.CHOOSING_ANALYTIC
+    else:
+        await update.message.reply_text("🛡 Invalid Choice !", reply_markup=markup_3)
+        return handlers.CHOOSING_ANALYTIC

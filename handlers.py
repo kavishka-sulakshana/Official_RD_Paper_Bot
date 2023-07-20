@@ -7,8 +7,8 @@ from telegram.ext import (
 )
 
 # States for the bot
-TYPING_BARCODE, CHOOSING, TYPING_PAPER, TYPING_ISSUE, CHOOSING_CLASS, CHOOSING_OPERATION = range(
-    6)
+TYPING_BARCODE, CHOOSING, TYPING_PAPER, TYPING_ISSUE, CHOOSING_CLASS, CHOOSING_OPERATION, CHOOSING_ANALYTIC, CHOOSING_CLASS_ANALYTIC = range(
+    8)
 
 
 conv_handler = ConversationHandler(
@@ -20,6 +20,9 @@ conv_handler = ConversationHandler(
             ),
             MessageHandler(
                 filters.Regex("^📍 Paper Issues$"), functions.paper_issue
+            ),
+            MessageHandler(
+                filters.Regex("^📊  See Analysis$"), functions.get_analytics
             ),
             MessageHandler(
                 filters.Regex("^❌  Close"), functions.done
@@ -73,6 +76,27 @@ conv_handler = ConversationHandler(
             ),
             MessageHandler(
                 filters.TEXT, functions.invalid_choice_2
+            ),
+        ],
+        CHOOSING_ANALYTIC: [
+            MessageHandler(
+                filters.Regex(
+                    "^📊  Get Data Analysis$"), functions.get_data_analytics
+            ),
+            MessageHandler(
+                filters.Regex(
+                    "^📈  Get Graph Analysis$"), functions.get_graph_analytics
+            ),
+            MessageHandler(
+                filters.Regex("^❌  Close"), functions.done
+            ),
+            MessageHandler(
+                filters.TEXT, functions.invalid_choice_3
+            ),
+        ],
+        CHOOSING_CLASS_ANALYTIC: [
+            MessageHandler(
+                filters.TEXT, functions.showAnalytics
             ),
         ]
     },
