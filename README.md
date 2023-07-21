@@ -1,4 +1,4 @@
-# Paper Class Helper _( Version 1.0 )_
+# Paper Class Helper _( Version 2.0 )_
 
 ## PIP Dependancy Libraries
 
