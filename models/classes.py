@@ -51,4 +51,6 @@ def get_average(marks: dict) -> tuple:
         if marks[key] is not None:
             total += float(marks[key])
             count += 1
+    if count == 0:
+        return (0, 0)
     return (total/count, count)
