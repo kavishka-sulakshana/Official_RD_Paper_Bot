@@ -16,4 +16,4 @@ RUN setfacl -d /var/run/docker.sock:tele-user
 
 EXPOSE 8443
 
-CMD ["python", "app.py"]
+CMD ["python", "'bot.py"]
