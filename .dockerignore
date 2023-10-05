@@ -1,0 +1,9 @@
+googleCredentials.json
+.gitignore
+myenv
+.vscode
+__pycache__
+design
+README.md
+.env
+.env.example
