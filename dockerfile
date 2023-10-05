@@ -7,6 +7,7 @@ COPY . /app
 
 WORKDIR /app
 
+RUN useradd -ms /bin/sh tele-user
 USER tele-user
 
 ENV DOCKER_HOST=unix:///var/run/docker.sock
