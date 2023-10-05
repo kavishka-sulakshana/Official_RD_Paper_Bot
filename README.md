@@ -1,5 +1,7 @@
 # Paper Class Helper _( Version 2.0 )_
 
+[![Push to Docker Hub - BOT](https://github.com/kavishka-sulakshana/Official_RD_Paper_Bot/actions/workflows/main.yml/badge.svg)](https://github.com/kavishka-sulakshana/Official_RD_Paper_Bot/actions/workflows/main.yml)
+
 ## PIP Dependancy Libraries
 
 `pip install <...>`
