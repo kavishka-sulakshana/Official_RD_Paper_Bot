@@ -1,4 +1,5 @@
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+import asyncio
 import requests
 from telegram.ext import (
     ContextTypes,
@@ -85,11 +86,13 @@ async def enter_paper_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         print(fileName, filePath)
         try:
             data = classes.get_marks(clz, paper, barcode).to_dict()
-            storage_functions.save_file(filePath, fileName)
+            await asyncio.to_thread(storage_functions.save_file, filePath, fileName)
+            # storage_functions.save_file(filePath, fileName)
             caption = "Marks : {}\n\nRank : {}".format(
                 data['marks'], data['rank'])
             await bot.send_document(chat_id=chat_id, document="temp/{}".format(fileName), caption=caption)
-            storage_functions.delete_local_file("temp/{}".format(fileName))
+            await asyncio.to_thread(storage_functions.delete_local_file, "temp/{}".format(fileName))
+            # storage_functions.delete_local_file("temp/{}".format(fileName))
         except Exception as e:
             print(e)
             await update.message.reply_text(
